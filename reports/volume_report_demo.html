@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Volume Report 2025-08-01 to 2025-08-12 | Threshold: 10,000</title>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:24px;}
+.grid{display:grid;grid-template-columns:1fr;gap:32px;}
+.sec{border:1px solid #eee;border-radius:8px;padding:16px;}
+.small{font-size:12px;color:#555}
+.table-wrapper{overflow:auto; max-height:420px;}
+ table{border-collapse:collapse;}
+ th, td{border:1px solid #ddd;padding:6px 8px;}
+ th{background:#fafafa;}
+</style>
+</head>
+<body>
+<h2>Volume Report 2025-08-01 to 2025-08-12 | Threshold: 10,000</h2>
+<div class="grid">
+  <div class="sec">
+    <h3>Higher vs Lower</h3>
+    <div id="chart_hilo"></div>
+  </div>
+  <div class="sec">
+    <h3>Top Higher Websites</h3>
+    <div id="chart_top_h"></div>
+  </div>
+  <div class="sec">
+    <h3>Top Lower Websites</h3>
+    <div id="chart_top_l"></div>
+  </div>
+  <div class="sec">
+    <h3>Best & Worst Performance</h3>
+    <div id="chart_best"></div>
+    <div id="chart_worst"></div>
+  </div>
+  <div class="sec">
+    <h3>Filtered Rows</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>{c}</th><th>{c}</th><th>{c}</th><th>{c}</th><th>{c}</th><th>{c}</th></tr></thead>
+        <tbody>
+          <tr><td>2025-08-02</td><td>BOOKINGDOTCOM</td><td>100,116</td><td>133,879</td><td>-33,763</td><td>Lower</td></tr><tr><td>2025-08-03</td><td>BOOKINGDOTCOM</td><td>154,605</td><td>100,116</td><td>54,489</td><td>Higher</td></tr><tr><td>2025-08-04</td><td>BOOKINGDOTCOM</td><td>112,658</td><td>154,605</td><td>-41,947</td><td>Lower</td></tr><tr><td>2025-08-05</td><td>BOOKINGDOTCOM</td><td>153,587</td><td>112,658</td><td>40,929</td><td>Higher</td></tr><tr><td>2025-08-06</td><td>BOOKINGDOTCOM</td><td>124,384</td><td>153,587</td><td>-29,203</td><td>Lower</td></tr><tr><td>2025-08-07</td><td>BOOKINGDOTCOM</td><td>154,185</td><td>124,384</td><td>29,801</td><td>Higher</td></tr><tr><td>2025-08-08</td><td>BOOKINGDOTCOM</td><td>129,118</td><td>154,185</td><td>-25,067</td><td>Lower</td></tr><tr><td>2025-08-11</td><td>BOOKINGDOTCOM</td><td>99,717</td><td>122,604</td><td>-22,887</td><td>Lower</td></tr><tr><td>2025-08-12</td><td>BOOKINGDOTCOM</td><td>117,994</td><td>99,717</td><td>18,277</td><td>Higher</td></tr><tr><td>2025-08-02</td><td>BOOKINGMOBAPPCUG</td><td>142,092</td><td>131,359</td><td>10,733</td><td>Higher</td></tr><tr><td>2025-08-03</td><td>BOOKINGMOBAPPCUG</td><td>153,269</td><td>142,092</td><td>11,177</td><td>Higher</td></tr><tr><td>2025-08-05</td><td>BOOKINGMOBAPPCUG</td><td>110,875</td><td>154,570</td><td>-43,695</td><td>Lower</td></tr><tr><td>2025-08-07</td><td>BOOKINGMOBAPPCUG</td><td>141,809</td><td>113,656</td><td>28,153</td><td>Higher</td></tr><tr><td>2025-08-08</td><td>BOOKINGMOBAPPCUG</td><td>111,414</td><td>141,809</td><td>-30,395</td><td>Lower</td></tr><tr><td>2025-08-11</td><td>BOOKINGMOBAPPCUG</td><td>121,549</td><td>104,036</td><td>17,513</td><td>Higher</td></tr><tr><td>2025-08-12</td><td>BOOKINGMOBAPPCUG</td><td>141,090</td><td>121,549</td><td>19,541</td><td>Higher</td></tr><tr><td>2025-08-02</td><td>GOOGLEHPA</td><td>98,159</td><td>82,130</td><td>16,029</td><td>Higher</td></tr><tr><td>2025-08-03</td><td>GOOGLEHPA</td><td>113,096</td><td>98,159</td><td>14,937</td><td>Higher</td></tr><tr><td>2025-08-04</td><td>GOOGLEHPA</td><td>123,309</td><td>113,096</td><td>10,213</td><td>Higher</td></tr><tr><td>2025-08-05</td><td>GOOGLEHPA</td><td>95,086</td><td>123,309</td><td>-28,223</td><td>Lower</td></tr><tr><td>2025-08-06</td><td>GOOGLEHPA</td><td>84,155</td><td>95,086</td><td>-10,931</td><td>Lower</td></tr><tr><td>2025-08-07</td><td>GOOGLEHPA</td><td>96,324</td><td>84,155</td><td>12,169</td><td>Higher</td></tr><tr><td>2025-08-09</td><td>GOOGLEHPA</td><td>134,858</td><td>105,849</td><td>29,009</td><td>Higher</td></tr><tr><td>2025-08-10</td><td>GOOGLEHPA</td><td>81,031</td><td>134,858</td><td>-53,827</td><td>Lower</td></tr><tr><td>2025-08-11</td><td>GOOGLEHPA</td><td>111,008</td><td>81,031</td><td>29,977</td><td>Higher</td></tr><tr><td>2025-08-03</td><td>TRAVELOKAMOBAPP</td><td>132,762</td><td>115,921</td><td>16,841</td><td>Higher</td></tr><tr><td>2025-08-04</td><td>TRAVELOKAMOBAPP</td><td>117,231</td><td>132,762</td><td>-15,531</td><td>Lower</td></tr><tr><td>2025-08-05</td><td>TRAVELOKAMOBAPP</td><td>162,240</td><td>117,231</td><td>45,009</td><td>Higher</td></tr><tr><td>2025-08-06</td><td>TRAVELOKAMOBAPP</td><td>113,469</td><td>162,240</td><td>-48,771</td><td>Lower</td></tr><tr><td>2025-08-07</td><td>TRAVELOKAMOBAPP</td><td>142,550</td><td>113,469</td><td>29,081</td><td>Higher</td></tr><tr><td>2025-08-08</td><td>TRAVELOKAMOBAPP</td><td>131,803</td><td>142,550</td><td>-10,747</td><td>Lower</td></tr><tr><td>2025-08-10</td><td>TRAVELOKAMOBAPP</td><td>127,913</td><td>138,524</td><td>-10,611</td><td>Lower</td></tr><tr><td>2025-08-02</td><td>EXPEDIA</td><td>124,643</td><td>170,950</td><td>-46,307</td><td>Lower</td></tr><tr><td>2025-08-04</td><td>EXPEDIA</td><td>158,177</td><td>130,396</td><td>27,781</td><td>Higher</td></tr><tr><td>2025-08-05</td><td>EXPEDIA</td><td>136,546</td><td>158,177</td><td>-21,631</td><td>Lower</td></tr><tr><td>2025-08-06</td><td>EXPEDIA</td><td>122,127</td><td>136,546</td><td>-14,419</td><td>Lower</td></tr><tr><td>2025-08-07</td><td>EXPEDIA</td><td>152,280</td><td>122,127</td><td>30,153</td><td>Higher</td></tr><tr><td>2025-08-10</td><td>EXPEDIA</td><td>167,387</td><td>141,886</td><td>25,501</td><td>Higher</td></tr><tr><td>2025-08-12</td><td>EXPEDIA</td><td>147,577</td><td>171,156</td><td>-23,579</td><td>Lower</td></tr><tr><td>2025-08-02</td><td>EXPEDIAMOCUG</td><td>137,295</td><td>167,106</td><td>-29,811</td><td>Lower</td></tr><tr><td>2025-08-04</td><td>EXPEDIAMOCUG</td><td>109,261</td><td>146,392</td><td>-37,131</td><td>Lower</td></tr><tr><td>2025-08-05</td><td>EXPEDIAMOCUG</td><td>155,006</td><td>109,261</td><td>45,745</td><td>Higher</td></tr><tr><td>2025-08-06</td><td>EXPEDIAMOCUG</td><td>135,099</td><td>155,006</td><td>-19,907</td><td>Lower</td></tr><tr><td>2025-08-07</td><td>EXPEDIAMOCUG</td><td>159,508</td><td>135,099</td><td>24,409</td><td>Higher</td></tr><tr><td>2025-08-09</td><td>EXPEDIAMOCUG</td><td>111,546</td><td>158,649</td><td>-47,103</td><td>Lower</td></tr><tr><td>2025-08-10</td><td>EXPEDIAMOCUG</td><td>124,007</td><td>111,546</td><td>12,461</td><td>Higher</td></tr><tr><td>2025-08-11</td><td>EXPEDIAMOCUG</td><td>158,768</td><td>124,007</td><td>34,761</td><td>Higher</td></tr><tr><td>2025-08-12</td><td>EXPEDIAMOCUG</td><td>129,541</td><td>158,768</td><td>-29,227</td><td>Lower</td></tr><tr><td>2025-08-02</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>134,610</td><td>124,533</td><td>10,077</td><td>Higher</td></tr><tr><td>2025-08-03</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>102,699</td><td>134,610</td><td>-31,911</td><td>Lower</td></tr><tr><td>2025-08-05</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>158,353</td><td>105,136</td><td>53,217</td><td>Higher</td></tr><tr><td>2025-08-06</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>117,502</td><td>158,353</td><td>-40,851</td><td>Lower</td></tr><tr><td>2025-08-08</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>136,956</td><td>108,967</td><td>27,989</td><td>Higher</td></tr><tr><td>2025-08-09</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>119,149</td><td>136,956</td><td>-17,807</td><td>Lower</td></tr><tr><td>2025-08-10</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>143,978</td><td>119,149</td><td>24,829</td><td>Higher</td></tr><tr><td>2025-08-11</td><td>MAKEMYTRIPANDROIDMOBAPP</td><td>129,219</td><td>143,978</td><td>-14,759</td><td>Lower</td></tr><tr><td>2025-08-02</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>174,243</td><td>127,574</td><td>46,669</td><td>Higher</td></tr><tr><td>2025-08-03</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>162,636</td><td>174,243</td><td>-11,607</td><td>Lower</td></tr><tr><td>2025-08-06</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>174,575</td><td>161,010</td><td>13,565</td><td>Higher</td></tr><tr><td>2025-08-07</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>148,872</td><td>174,575</td><td>-25,703</td><td>Lower</td></tr><tr><td>2025-08-08</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>118,413</td><td>148,872</td><td>-30,459</td><td>Lower</td></tr><tr><td>2025-08-09</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>159,854</td><td>118,413</td><td>41,441</td><td>Higher</td></tr><tr><td>2025-08-10</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>131,291</td><td>159,854</td><td>-28,563</td><td>Lower</td></tr><tr><td>2025-08-12</td><td>MAKEMYTRIPANDROIDMOBAPPCUGAG</td><td>149,753</td><td>130,852</td><td>18,901</td><td>Higher</td></tr><tr><td>2025-08-02</td><td>MAKEMYTRIPCTH</td><td>154,043</td><td>123,806</td><td>30,237</td><td>Higher</td></tr><tr><td>2025-08-03</td><td>MAKEMYTRIPCTH</td><td>135,668</td><td>154,043</td><td>-18,375</td><td>Lower</td></tr><tr><td>2025-08-04</td><td>MAKEMYTRIPCTH</td><td>165,049</td><td>135,668</td><td>29,381</td><td>Higher</td></tr><tr><td>2025-08-05</td><td>MAKEMYTRIPCTH</td><td>152,282</td><td>165,049</td><td>-12,767</td><td>Lower</td></tr><tr><td>2025-08-06</td><td>MAKEMYTRIPCTH</td><td>121,607</td><td>152,282</td><td>-30,675</td><td>Lower</td></tr><tr><td>2025-08-08</td><td>MAKEMYTRIPCTH</td><td>145,253</td><td>114,384</td><td>30,869</td><td>Higher</td></tr><tr><td>2025-08-09</td><td>MAKEMYTRIPCTH</td><td>130,966</td><td>145,253</td><td>-14,287</td><td>Lower</td></tr><tr><td>2025-08-12</td><td>MAKEMYTRIPCTH</td><td>136,881</td><td>121,676</td><td>15,205</td><td>Higher</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<p class="small">Generated at 2025-08-13 06:39:41</p>
+<script>
+  const dates = ['2025-08-02', '2025-08-03', '2025-08-04', '2025-08-05', '2025-08-06', '2025-08-07', '2025-08-08', '2025-08-09', '2025-08-10', '2025-08-11', '2025-08-12'];
+  const higher = [5, 4, 3, 4, 1, 6, 2, 2, 3, 3, 4];
+  const lower = [3, 3, 3, 4, 7, 1, 4, 3, 3, 2, 2];
+  Plotly.newPlot('chart_hilo', [
+    {x: dates, y: higher, type: 'bar', name: 'Higher', marker: {color: '#2ca02c'}},
+    {x: dates, y: lower, type: 'bar', name: 'Lower', marker: {color: '#d62728'}},
+  ], {barmode:'group', title:'Higher vs Lower counts per day'});
+
+  Plotly.newPlot('chart_top_h', [
+    {x: ['BOOKINGDOTCOM', 'MAKEMYTRIPANDROIDMOBAPPCUGAG', 'EXPEDIAMOCUG', 'MAKEMYTRIPANDROIDMOBAPP', 'GOOGLEHPA', 'MAKEMYTRIPCTH', 'TRAVELOKAMOBAPP', 'BOOKINGMOBAPPCUG', 'EXPEDIA'], y: [143496, 120576, 117376, 116112, 112334, 105692, 90931, 87117, 83435], type:'bar', marker: {color:'#1f77b4'}}
+  ], {title: 'Top Higher Websites by total abs diff'});
+
+  Plotly.newPlot('chart_top_l', [
+    {x: ['EXPEDIAMOCUG', 'BOOKINGDOTCOM', 'EXPEDIA', 'MAKEMYTRIPANDROIDMOBAPP', 'MAKEMYTRIPANDROIDMOBAPPCUGAG', 'GOOGLEHPA', 'TRAVELOKAMOBAPP', 'MAKEMYTRIPCTH', 'BOOKINGMOBAPPCUG'], y: [163179, 152867, 105936, 105328, 96332, 92981, 85660, 76104, 74090], type:'bar', marker: {color:'#9467bd'}}
+  ], {title: 'Top Lower Websites by total abs diff'});
+
+  Plotly.newPlot('chart_best', [
+    {x: ['MAKEMYTRIPCTH', 'MAKEMYTRIPANDROIDMOBAPPCUGAG', 'GOOGLEHPA', 'BOOKINGMOBAPPCUG', 'MAKEMYTRIPANDROIDMOBAPP', 'TRAVELOKAMOBAPP', 'BOOKINGDOTCOM', 'EXPEDIA', 'EXPEDIAMOCUG'], y: [29588, 24244, 19353, 13027, 10784, 5271, -9371, -22501, -45803], type:'bar', marker: {color:'#2ca02c'}}
+  ], {title: 'Best (Cumulative Increase)'});
+
+  Plotly.newPlot('chart_worst', [
+    {x: ['EXPEDIAMOCUG', 'EXPEDIA', 'BOOKINGDOTCOM', 'TRAVELOKAMOBAPP', 'MAKEMYTRIPANDROIDMOBAPP', 'BOOKINGMOBAPPCUG', 'GOOGLEHPA', 'MAKEMYTRIPANDROIDMOBAPPCUGAG', 'MAKEMYTRIPCTH'], y: [-45803, -22501, -9371, 5271, 10784, 13027, 19353, 24244, 29588], type:'bar', marker: {color:'#d62728'}}
+  ], {title: 'Worst (Cumulative Decrease)'});
+</script>
+</body>
+</html>
