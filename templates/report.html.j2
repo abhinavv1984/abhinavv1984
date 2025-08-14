@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SQL Test Report</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 24px; color: #1f2937; }
+    h1 { font-size: 22px; margin: 0 0 8px 0; }
+    .meta { color: #6b7280; margin-bottom: 16px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-align: top; }
+    th { background-color: #f9fafb; }
+    .status-pass { color: #065f46; font-weight: bold; }
+    .status-fail { color: #991b1b; font-weight: bold; }
+    .badge { border-radius: 12px; padding: 2px 8px; font-size: 12px; display: inline-block; }
+    .pass { background: #d1fae5; color: #065f46; }
+    .fail { background: #fee2e2; color: #991b1b; }
+    .section { margin-top: 28px; }
+    pre { background: #f9fafb; padding: 8px; overflow-x: auto; border: 1px solid #e5e7eb; }
+    .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+    .card { border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; min-width: 180px; background: #fff; }
+  </style>
+</head>
+<body>
+  <h1>SQL Test Report</h1>
+  <div class="meta">Generated: {{ generated_at }} | Environment: {{ environment }} | Total: {{ totals.total }} | Passed: {{ totals.passed }} | Failed: {{ totals.failed }} | Duration: {{ totals.duration_hms }}</div>
+
+  <div class="section">
+    <h2>Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>TestCaseId</th>
+          <th>TestCaseName</th>
+          <th>Status</th>
+          <th>Rows</th>
+          <th>Duration (s)</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ r.test_case_id }}</td>
+          <td>{{ r.test_case_name }}</td>
+          <td class="{{ 'status-pass' if r.status == 'Passed' else 'status-fail' }}">{{ r.status }}</td>
+          <td>{{ r.row_count }}</td>
+          <td>{{ '%.3f' % r.duration_seconds }}</td>
+          <td>{{ r.output_summary }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Details</h2>
+    {% for r in results %}
+      <div class="card">
+        <div><strong>{{ r.test_case_id }} - {{ r.test_case_name }}</strong> — <span class="badge {{ 'pass' if r.status == 'Passed' else 'fail' }}">{{ r.status }}</span></div>
+        {% if r.description %}<div class="meta">{{ r.description }}</div>{% endif %}
+        <div class="meta">Rows: {{ r.row_count }} | Duration: {{ '%.3f' % r.duration_seconds }} s | Database: {{ r.database or '-' }}</div>
+        <details>
+          <summary>SQL Script</summary>
+          <pre>{{ r.sql_preview }}</pre>
+        </details>
+        {% if r.error_message %}
+          <details open>
+            <summary>Error</summary>
+            <pre>{{ r.error_message }}</pre>
+          </details>
+        {% endif %}
+        {% if r.sample_rows_html %}
+          <details open>
+            <summary>Top {{ r.row_limit_for_report }} rows</summary>
+            {{ r.sample_rows_html | safe }}
+          </details>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

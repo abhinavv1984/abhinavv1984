@@ -1,0 +1,14 @@
+default_env: dev
+
+environments:
+  dev:
+    driver: ODBC Driver 18 for SQL Server
+    server: ${DB_HOST:localhost}
+    port: ${DB_PORT:1433}
+    database: ${DB_NAME:master}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:YourStrong!Passw0rd}
+    encrypt: true
+    trust_server_certificate: true
+    login_timeout_seconds: 15
+    query_timeout_seconds: 60
