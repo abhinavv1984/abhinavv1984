@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SQL Test Report</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 24px; color: #1f2937; }
+    h1 { font-size: 22px; margin: 0 0 8px 0; }
+    .meta { color: #6b7280; margin-bottom: 16px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-align: top; }
+    th { background-color: #f9fafb; }
+    .status-pass { color: #065f46; font-weight: bold; }
+    .status-fail { color: #991b1b; font-weight: bold; }
+    .badge { border-radius: 12px; padding: 2px 8px; font-size: 12px; display: inline-block; }
+    .pass { background: #d1fae5; color: #065f46; }
+    .fail { background: #fee2e2; color: #991b1b; }
+    .section { margin-top: 28px; }
+    pre { background: #f9fafb; padding: 8px; overflow-x: auto; border: 1px solid #e5e7eb; }
+    .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+    .card { border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; min-width: 180px; background: #fff; }
+  </style>
+</head>
+<body>
+  <h1>SQL Test Report</h1>
+  <div class="meta">Generated: 2025-08-14 07:53:32 | Environment: dev | Total: 3 | Passed: 3 | Failed: 0 | Duration: 00:00:00</div>
+
+  <div class="section">
+    <h2>Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>TestCaseId</th>
+          <th>TestCaseName</th>
+          <th>Status</th>
+          <th>Rows</th>
+          <th>Duration (s)</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td>1</td>
+          <td>TC_001</td>
+          <td>No rows (inline SqlText)</td>
+          <td class="status-pass">Passed</td>
+          <td>0</td>
+          <td>0.000</td>
+          <td>No violations</td>
+        </tr>
+        
+        <tr>
+          <td>2</td>
+          <td>TC_002</td>
+          <td>No rows (from SqlFile)</td>
+          <td class="status-pass">Passed</td>
+          <td>0</td>
+          <td>0.000</td>
+          <td>No violations</td>
+        </tr>
+        
+        <tr>
+          <td>3</td>
+          <td>TC_003</td>
+          <td>Failure example (returns 1 row)</td>
+          <td class="status-pass">Passed</td>
+          <td>0</td>
+          <td>0.000</td>
+          <td>No violations</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Details</h2>
+    
+      <div class="card">
+        <div><strong>TC_001 - No rows (inline SqlText)</strong> — <span class="badge pass">Passed</span></div>
+        <div class="meta">Should pass because it returns zero rows</div>
+        <div class="meta">Rows: 0 | Duration: 0.000 s | Database: -</div>
+        <details>
+          <summary>SQL Script</summary>
+          <pre>SELECT TOP 0 * FROM sys.objects;</pre>
+        </details>
+        
+        
+      </div>
+    
+      <div class="card">
+        <div><strong>TC_002 - No rows (from SqlFile)</strong> — <span class="badge pass">Passed</span></div>
+        <div class="meta">Should pass because it returns zero rows</div>
+        <div class="meta">Rows: 0 | Duration: 0.000 s | Database: -</div>
+        <details>
+          <summary>SQL Script</summary>
+          <pre>-- Sample SQL returning zero rows (assuming sys.objects has names)
+SELECT TOP 0 * FROM sys.objects WHERE name LIKE 'no_such_object_%';
+</pre>
+        </details>
+        
+        
+      </div>
+    
+      <div class="card">
+        <div><strong>TC_003 - Failure example (returns 1 row)</strong> — <span class="badge pass">Passed</span></div>
+        <div class="meta">Should fail because it returns a row</div>
+        <div class="meta">Rows: 0 | Duration: 0.000 s | Database: -</div>
+        <details>
+          <summary>SQL Script</summary>
+          <pre>SELECT 1 AS Violation;</pre>
+        </details>
+        
+        
+      </div>
+    
+  </div>
+</body>
+</html>
