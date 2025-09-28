@@ -91,10 +91,7 @@ class AuthDbService:
 				pass
 
 
-def get_db_connection(config: dict):
-	db = config.get('database', {})
-	if 'test_db' in db and 'auth_db' in db:
-		db = db.get('test_db', {})
+def _connect_to_db(db: dict):
 	conn_str = (
 		f"DRIVER={db['driver']};"
 		f"SERVER={db['server']};"
@@ -110,6 +107,22 @@ def get_db_connection(config: dict):
 	except Exception:
 		pass
 	return conn
+
+
+def get_test_db_connection(config: dict):
+	db_root = config.get('database', {})
+	if 'test_db' in db_root:
+		return _connect_to_db(db_root['test_db'])
+	# fallback to legacy single db config
+	return _connect_to_db(db_root)
+
+
+def get_auth_db_connection(config: dict):
+	db_root = config.get('database', {})
+	if 'auth_db' in db_root:
+		return _connect_to_db(db_root['auth_db'])
+	# fallback to test db if auth not provided
+	return get_test_db_connection(config)
 
 
 # -----------------------------
@@ -270,8 +283,10 @@ async def get_new_max_reportdetailid(service: AuthDbService, userid: int, report
 
 async def run_single_test(config: dict, test_id: str):
 	start_time = time.time()
-	conn = get_db_connection(config)
-	service = AuthDbService(conn)
+	# Separate connections
+	conn_test = get_test_db_connection(config)
+	conn_auth = get_auth_db_connection(config)
+	service = AuthDbService(conn_auth)
 
 	# Load users
 	if pd is None:
@@ -281,12 +296,12 @@ async def run_single_test(config: dict, test_id: str):
 	sample_size = config['test'].get('sample_size', len(enabled_users))
 	enabled_users = [uid for uid in enabled_users if uid not in config['test'].get('exclude_userids', [])][:sample_size]
 
-	report_ids_map = fetch_latest_report_ids(conn, enabled_users)
+	report_ids_map = fetch_latest_report_ids(conn_test, enabled_users)
 	results = []
 	any_report_ids = False
 
 	for userid in enabled_users:
-		customername, customer_id = fetch_customer_details(conn, userid)
+		customername, customer_id = fetch_customer_details(conn_test, userid)
 		report_ids = report_ids_map.get(userid, [])
 		if report_ids:
 			any_report_ids = True
@@ -366,8 +381,9 @@ async def run_single_test(config: dict, test_id: str):
 
 async def run_once(config: dict):
 	start_time = time.time()
-	conn = get_db_connection(config)
-	service = AuthDbService(conn)
+	conn_test = get_test_db_connection(config)
+	conn_auth = get_auth_db_connection(config)
+	service = AuthDbService(conn_auth)
 
 	if pd is None:
 		raise RuntimeError("pandas not installed; required to read Excel test file")
@@ -380,12 +396,12 @@ async def run_once(config: dict):
 	sample_size = config['test'].get('sample_size', len(enabled_users))
 	enabled_users = [uid for uid in enabled_users if uid not in config['test'].get('exclude_userids', [])][:sample_size]
 
-	report_ids_map = fetch_latest_report_ids(conn, enabled_users)
+	report_ids_map = fetch_latest_report_ids(conn_test, enabled_users)
 	results = []
 	any_report_ids = False
 
 	for userid in enabled_users:
-		customername, customer_id = fetch_customer_details(conn, userid)
+		customername, customer_id = fetch_customer_details(conn_test, userid)
 		report_ids = report_ids_map.get(userid, [])
 		if report_ids:
 			any_report_ids = True
