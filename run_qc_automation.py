@@ -746,59 +746,7 @@ def main():
                         except Exception as e:
                             logging.error(f"Error inserting/updating into RG_QC_TestRunAutomate_QA for Test {testid}, Report {reportid}, WebsiteID {website_id}: {e}")
 
-            # If all tests for this report are pass/stats then create/update a default ignore row
-            if user_report_results.get(reportid) and all(s.lower() in ['pass', 'stats'] for s, _, _, _, _, _, _, _ in user_report_results.get(reportid, [])):
-                if table_exists:
-                    cursor = conn.cursor()
-                    testid_def = "AllTestsPassed"
-                    testname_def = "All test cases passed, only filling MaxReportdetailID"
-                    priority_def = "Low"
-                    status_def = "Ignore"
-                    total_count_def = 0
-                    failure_count_def = 0
-                    website_id_def = ""
-                    comma_sep_ids_def = ""
-                    exec_seconds_def = 0
-                    formatted_time_def = "0 sec"
-                    errordetails_json_def = ""
-
-                    try:
-                        cursor.execute("""
-                            SELECT 1 FROM [rg_oprationalbackup].[dbo].[RG_QC_TestRunAutomate_QA]
-                            WHERE ReportID = ? AND UserId = ? AND TestCaseID = ?
-                        """, (reportid, userid, testid_def))
-                        exists = cursor.fetchone() is not None
-
-                        customer_id_insert = customer_id or 0
-
-                        if exists:
-                            update_sql = """
-                                UPDATE [rg_oprationalbackup].[dbo].[RG_QC_TestRunAutomate_QA]
-                                SET TCStatus = ?, TotalCount = ?, TCFailureCount = ?, Requestsegmentid = ?, MaxReportdetailID = ?, LogDate = ?, errordetails = ?,
-                                    ExecutionTimeSeconds = ?, ExecutionTimeFormatted = ?, TestCaseInfo = ?, TCPriority = ?
-                                WHERE ReportID = ? AND UserId = ? AND TestCaseID = ? AND WebsiteID = ?
-                            """
-                            cursor.execute(update_sql, (
-                                status_def, total_count_def, failure_count_def, comma_sep_ids_def, max_reportdetailid_new, datetime.now(), errordetails_json_def,
-                                exec_seconds_def, formatted_time_def, testname_def, priority_def, reportid, userid, testid_def, website_id_def
-                            ))
-                            conn.commit()
-                        else:
-                            insert_sql = """
-                                INSERT INTO [rg_oprationalbackup].[dbo].[RG_QC_TestRunAutomate_QA]
-                                (ReportID, AccountName, CustomerId, UserId, TestCaseID, TestCaseInfo, TCPriority, TCStatus, 
-                                 TotalCount, TCFailureCount, WebsiteID, Requestsegmentid, MaxReportdetailID, LogDate,
-                                 ExecutionTimeSeconds, ExecutionTimeFormatted)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            """
-                            cursor.execute(insert_sql, (
-                                reportid, customername, customer_id_insert, userid, testid_def, testname_def, priority_def, status_def,
-                                total_count_def, failure_count_def, website_id_def, comma_sep_ids_def, max_reportdetailid_new, datetime.now(),
-                                exec_seconds_def, formatted_time_def
-                            ))
-                            conn.commit()
-                    except Exception as e:
-                        logging.error(f"Error inserting/updating default record for Report {reportid}, User {userid}: {e}")
+            # Removed 'AllTestsPassed' auto-insert per requirement
 
     # generate consolidated report and send email
     from scripts.generate_full_report_v9 import fetch_report_data_from_db, generate_reports
