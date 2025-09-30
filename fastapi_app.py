@@ -18,11 +18,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from scripts.QA_Main_v3 import run_once
 from scripts.QA_HTML_V2 import fetch_report_data_from_db
 
-# Allow running even if scripts.db_service isn't present in this environment
-try:
-    from scripts.db_service import AsyncDatabaseService
-except Exception:  # pragma: no cover - fallback for local runs
-    from async_database_service import AsyncDatabaseService
+from scripts.db_service import AsyncDatabaseService
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
