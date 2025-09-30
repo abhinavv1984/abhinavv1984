@@ -244,16 +244,26 @@ def has_new_data(conn, table_name, reportid, max_reportdetailid_prev):
         return False
 
 # ----------------------- SQL content helpers -----------------------
-def build_replacements(table_name, reportid, userid, max_reportdetailid_param):
+def build_replacements(table_name, reportid, userid, lower_max_reportdetailid, upper_max_reportdetailid):
     # Support common placeholder variants used in .sql files
+    lower_val = str(int(lower_max_reportdetailid) if lower_max_reportdetailid is not None else 0)
+    upper_val = str(int(upper_max_reportdetailid) if upper_max_reportdetailid is not None else 0)
     return {
         "{table}": table_name or "",
         "{table_name}": table_name or "",
         "{reportid}": str(int(reportid) if reportid is not None else 0),
         "{userid}": str(int(userid) if userid is not None else 0),
         "{user}": str(int(userid) if userid is not None else 0),
-        "{max_reportdetailid}": str(int(max_reportdetailid_param) if max_reportdetailid_param is not None else 0),
-        "{details}": str(int(max_reportdetailid_param) if max_reportdetailid_param is not None else 0),
+        # Back-compat: treat {max_reportdetailid} and {details} as LOWER bound
+        "{max_reportdetailid}": lower_val,
+        "{details}": lower_val,
+        # Optional explicit range placeholders if used by SQL
+        "{max_reportdetailid_lower}": lower_val,
+        "{max_reportdetailid_upper}": upper_val,
+        "{from_max_reportdetailid}": lower_val,
+        "{to_max_reportdetailid}": upper_val,
+        "{prev_max_reportdetailid}": lower_val,
+        "{new_max_reportdetailid}": upper_val,
     }
 
 def apply_replacements(sql_text, replacements):
@@ -263,7 +273,7 @@ def apply_replacements(sql_text, replacements):
     return out
 
 # ----------------------- run_test_case -----------------------
-def run_test_case(conn, sql_path, table_name, reportid, sample_size, max_reportdetailid_param, priority, userid):
+def run_test_case(conn, sql_path, table_name, reportid, sample_size, lower_max_reportdetailid, upper_max_reportdetailid, priority, userid):
     """
     Runs a single test case by reading its .sql file and executing the queries exactly as defined.
     - Replaces placeholders found in file: {reportid}, {userid}/{user}, {max_reportdetailid}/{details}, {table}/{table_name}.
@@ -276,7 +286,7 @@ def run_test_case(conn, sql_path, table_name, reportid, sample_size, max_reportd
         with open(sql_path, "r", encoding="utf-8") as f:
             raw_sql = f.read().strip()
 
-        replacements = build_replacements(table_name, reportid, userid, max_reportdetailid_param)
+        replacements = build_replacements(table_name, reportid, userid, lower_max_reportdetailid, upper_max_reportdetailid)
         sql_text = apply_replacements(raw_sql, replacements)
 
         details_marker = "-- DETAILS_QUERY"
@@ -567,7 +577,7 @@ def main():
                 print(f"TestCaseID: {testid}, CustomerName: {customername}, ReportID: {reportid}, MaxReportDetailID: {max_reportdetailid_new}")
 
                 status, failure_count, details, columns, error_msg, details_sql, exec_seconds, formatted_time = run_test_case(
-                    conn, sql_path, table_name, reportid, sample_size, max_reportdetailid_new, priority, userid
+                    conn, sql_path, table_name, reportid, sample_size, max_reportdetailid_prev, max_reportdetailid_new, priority, userid
                 )
 
                 result_entry = {
