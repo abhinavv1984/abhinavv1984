@@ -221,6 +221,126 @@ class AsyncDatabaseService:
         """No persistent resources to release; return False to propagate exceptions."""
         return False
 
+    # -----------------------------
+    # Stored Procedure Helpers
+    # -----------------------------
+    def _build_sp_exec_sql(
+        self,
+        procedure_name: str,
+        params: Optional[Dict[str, Any]] = None,
+        types: Optional[Dict[str, str]] = None,
+    ) -> Tuple[str, Tuple[Any, ...]]:
+        """Build an EXEC statement for a stored procedure with explicit type casts.
+
+        - If `types` provides a SQL type for a parameter (e.g., 'INT', 'BIGINT', 'NVARCHAR(100)'),
+          the placeholder will be wrapped as CAST(? AS <TYPE>).
+        - If no type is provided for an integer parameter, auto-cast based on value range:
+            - |value| <= 2_147_483_647 -> INT
+            - otherwise -> BIGINT
+        - Other types will use an untyped placeholder `?` by default.
+        """
+
+        if not params:
+            return f"EXEC {procedure_name}", tuple()
+
+        assignments: List[str] = []
+        values: List[Any] = []
+
+        for name, value in params.items():
+            sql_type: Optional[str] = None
+            if types and name in types and types[name]:
+                sql_type = types[name].strip()
+            else:
+                # Auto-type only for ints if not provided
+                if isinstance(value, int):
+                    if abs(value) <= 2_147_483_647:
+                        sql_type = "INT"
+                    else:
+                        sql_type = "BIGINT"
+
+            if sql_type:
+                assignments.append(f"@{name} = CAST(? AS {sql_type})")
+            else:
+                assignments.append(f"@{name} = ?")
+            values.append(value)
+
+        assign_sql = ", ".join(assignments)
+        sql = f"EXEC {procedure_name} {assign_sql}"
+        return sql, tuple(values)
+
+    async def execute_sp_query(
+        self,
+        procedure_name: str,
+        params: Optional[Dict[str, Any]] = None,
+        types: Optional[Dict[str, str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Execute a stored procedure and return a list of rows (as dicts)."""
+
+        def _execute() -> List[Dict[str, Any]]:
+            sql, values = self._build_sp_exec_sql(procedure_name, params, types)
+            conn = pyodbc.connect(self.conn_str)
+            cursor = conn.cursor()
+            try:
+                cursor.execute(sql, values)
+                columns = [column[0] for column in cursor.description] if cursor.description else []
+                rows = cursor.fetchall() if cursor.description else []
+                results: List[Dict[str, Any]] = []
+                for row in rows:
+                    results.append(dict(zip(columns, row)))
+                return results
+            finally:
+                conn.close()
+
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, _execute)
+
+    async def execute_sp_scalar(
+        self,
+        procedure_name: str,
+        params: Optional[Dict[str, Any]] = None,
+        types: Optional[Dict[str, str]] = None,
+    ) -> Any:
+        """Execute a stored procedure and return the first column of the first row."""
+
+        def _execute() -> Any:
+            sql, values = self._build_sp_exec_sql(procedure_name, params, types)
+            conn = pyodbc.connect(self.conn_str)
+            cursor = conn.cursor()
+            try:
+                cursor.execute(sql, values)
+                row = cursor.fetchone()
+                return row[0] if row else None
+            finally:
+                conn.close()
+
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, _execute)
+
+    async def execute_sp_non_query(
+        self,
+        procedure_name: str,
+        params: Optional[Dict[str, Any]] = None,
+        types: Optional[Dict[str, str]] = None,
+    ) -> int:
+        """Execute a stored procedure that does not return a result set.
+
+        Returns the cursor.rowcount (may be -1 for procedures that do not set it).
+        """
+
+        def _execute() -> int:
+            sql, values = self._build_sp_exec_sql(procedure_name, params, types)
+            conn = pyodbc.connect(self.conn_str)
+            cursor = conn.cursor()
+            try:
+                cursor.execute(sql, values)
+                conn.commit()
+                return cursor.rowcount
+            finally:
+                conn.close()
+
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, _execute)
+
 
 def get_test_db_service(config: dict) -> AsyncDatabaseService:
     """Get database service for test execution (RG_Centralizeddb)."""
