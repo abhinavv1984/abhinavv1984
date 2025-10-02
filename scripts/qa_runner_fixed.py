@@ -670,23 +670,6 @@ def main():
             )
             report_rows = cursor.fetchall()
             report_ids = [row.reportid for row in report_rows]
-            # Fallback: if none found (or customer_id missing), try by userid
-            if not report_ids:
-                try:
-                    _drain_remaining_results(cursor)
-                except Exception:
-                    pass
-                cursor = conn.cursor()
-                cursor.execute(
-                    """
-                    SELECT reportid FROM RG_Reports WITH (NOLOCK)
-                    WHERE userid = ?
-                    AND DeliveryDate >= DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                    AND DeliveryDate < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
-                    """,
-                    (userid,)
-                )
-                report_ids = [row.reportid for row in cursor.fetchall()]
             all_report_ids.update(report_ids)
         except Exception as e:
             logging.error(f"Error fetching reports for User {userid}: {e}")
