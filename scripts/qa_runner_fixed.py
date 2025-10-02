@@ -29,7 +29,7 @@ def load_config(config_file="config.yaml"):
         return None
 
 
-def _drain_remaining_results(cursor: pyodbc.Cursor) -> None:
+def _drain_remaining_results(cursor) -> None:
     """Best-effort: consume and discard any remaining results to free the connection.
 
     - Safely handles None or closed cursors
