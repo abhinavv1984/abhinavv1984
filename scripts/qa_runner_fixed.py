@@ -175,6 +175,44 @@ def parse_stats_resultset(columns, rows):
     return columns, rows
 
 
+def compute_stats_counts(columns, rows):
+    try:
+        if not rows:
+            return 0, 0
+        lower_cols = [c.lower() for c in columns] if columns else []
+        def col_index(name):
+            return next((i for i, c in enumerate(lower_cols) if c == name), -1)
+
+        idx_totalrequest = col_index('totalrequest')
+        idx_totalrecords = col_index('totalrecords')
+        idx_available = col_index('available')
+        idx_failed = col_index('failed')
+
+        total_count = 0
+        failure_count = 0
+
+        if idx_totalrequest != -1:
+            total_count = sum(int(r[idx_totalrequest] or 0) for r in rows)
+        elif idx_totalrecords != -1:
+            total_count = sum(int(r[idx_totalrecords] or 0) for r in rows)
+        else:
+            total_count = len(rows)
+
+        if idx_failed != -1:
+            failure_count = sum(int(r[idx_failed] or 0) for r in rows)
+        elif idx_available != -1:
+            try:
+                available_sum = sum(int(r[idx_available] or 0) for r in rows)
+                failure_count = max(total_count - available_sum, 0)
+            except Exception:
+                failure_count = 0
+
+        return total_count, failure_count
+    except Exception as e:
+        logging.error(f"compute_stats_counts error: {e}")
+        return (len(rows) if rows else 0), 0
+
+
 def fetch_customer_details(conn, userid):
     cursor = None
     try:
@@ -717,6 +755,8 @@ def main():
                         except Exception as e:
                             logging.error(f"Serialization error for stats: {e}")
 
+                    total_count_stats, failure_count_stats = compute_stats_counts(columns, details)
+
                     upsert_result_via_sp(conn, {
                         'ReportId': reportid,
                         'AccountName': customername,
@@ -726,8 +766,8 @@ def main():
                         'TestCaseInfo': testname,
                         'TCPriority': priority,
                         'TCStatus': 'Stats',
-                        'TotalCount': len(details) if details else 0,
-                        'TCFailureCount': 0,
+                        'TotalCount': total_count_stats,
+                        'TCFailureCount': failure_count_stats,
                         'WebsiteID': '',
                         'Requestsegmentid': '',
                         'MaxReportdetailID': max_reportdetailid_new,
