@@ -30,17 +30,31 @@ def load_config(config_file="config.yaml"):
 
 
 def _drain_remaining_results(cursor: pyodbc.Cursor) -> None:
-    """Consume and discard any remaining result sets to free the connection.
+    """Best-effort: consume and discard any remaining results to free the connection.
 
-    Many SQL Server stored procedures return extra result sets (including
-    rowcount messages when NOCOUNT is OFF). We must iterate through nextset()
-    until it returns False to avoid "Connection is busy with results" errors.
+    - Safely handles None or closed cursors
+    - Consumes current result rows (if any) in chunks
+    - Advances through any additional result sets via nextset()
     """
+    if cursor is None:
+        return
     try:
         while True:
+            # If current result set has a description, attempt to consume rows
+            try:
+                if getattr(cursor, "description", None):
+                    while True:
+                        chunk = cursor.fetchmany(1000)
+                        if not chunk:
+                            break
+            except Exception:
+                # Ignore fetch errors during draining
+                pass
+
             try:
                 more_results = cursor.nextset()
-            except pyodbc.Error:
+            except Exception:
+                # No more results or cursor not in a state to advance
                 break
             if not more_results:
                 break
