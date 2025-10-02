@@ -75,28 +75,15 @@ def fetch_report_data_from_db(config, report_ids):
     )
     cursor = conn.cursor()
 
-    if report_ids:
-        report_ids_str = ','.join(str(rid) for rid in report_ids)
-        query = f"""
-            SELECT ReportID, AccountName, CustomerId, UserId, TestCaseID, TestCaseInfo, TCPriority, TCStatus,
-                   TotalCount, TCFailureCount, WebsiteID, Requestsegmentid, MaxReportdetailID, LogDate, errordetails,
-                   ExecutionTimeSeconds, ExecutionTimeFormatted
-            FROM [rg_oprationalbackup].[dbo].[RG_QC_TestRunAutomate_QA]
-            WHERE ReportID IN ({report_ids_str})
-              AND LogDate >= CAST(GETDATE() AS DATE)
-              AND LogDate < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
-        """
-    else:
-        query = """
-            SELECT ReportID, AccountName, CustomerId, UserId, TestCaseID, TestCaseInfo, TCPriority, TCStatus,
-                   TotalCount, TCFailureCount, WebsiteID, Requestsegmentid, MaxReportdetailID, LogDate, errordetails,
-                   ExecutionTimeSeconds, ExecutionTimeFormatted
-            FROM [rg_oprationalbackup].[dbo].[RG_QC_TestRunAutomate_QA]
-            WHERE LogDate >= CAST(GETDATE() AS DATE)
-              AND LogDate < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
-        """
+    # Build parameters for SP: CSV list of report IDs and today's window
+    report_ids_csv = ','.join(str(rid) for rid in report_ids) if report_ids else None
+    from_date = datetime.combine(datetime.now().date(), datetime.min.time())
+    to_date = datetime.combine((datetime.now().date() + timedelta(days=1)), datetime.min.time())
 
-    cursor.execute(query)
+    cursor.execute(
+        "EXEC RG_OprationalBackup.dbo.USP_QC_QA_Report_Deduped @ReportIdCsv=?, @FromDate=?, @ToDate=?",
+        (report_ids_csv, from_date, to_date)
+    )
 
     results = []
     for row in cursor.fetchall():
@@ -133,9 +120,6 @@ def fetch_report_data_from_db(config, report_ids):
 
     conn.close()
 
-    # Dedupe at test granularity (UserId, CustomerName, ReportId, TestID)
-    results = _dedupe_results_at_test_level(results)
-
     return results
 
 
@@ -152,8 +136,7 @@ def generate_reports(results, config, total_time_str):
     os.makedirs(report_dir, exist_ok=True)
     os.makedirs(archive_dir, exist_ok=True)
 
-    # Dedupe again defensively in case callers pass non-deduped results
-    results = _dedupe_results_at_test_level(results or [])
+    # Results are expected to be pre-deduped by the stored procedure
 
     # Archive files modified yesterday
     yesterday = (datetime.now() - timedelta(days=1)).date()
