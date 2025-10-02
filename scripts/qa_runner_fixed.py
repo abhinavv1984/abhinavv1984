@@ -614,8 +614,8 @@ def main():
         return
 
     exclude_userids = config['test'].get('exclude_userids', [])
-    users_df = users_df[(users_df['Enabled'].str.lower() == 'yes') & (~users_df['UserID'].isin(exclude_userids))]
-    testcase_df = testcase_df[testcase_df['Enabled'].str.lower() == 'yes']
+    users_df = users_df[(users_df['Enabled'].astype(str).str.lower() == 'yes') & (~users_df['UserID'].isin(exclude_userids))]
+    testcase_df = testcase_df[testcase_df['Enabled'].astype(str).str.lower() == 'yes']
 
     conn = get_db_connection(config)
     if not conn:
@@ -641,14 +641,18 @@ def main():
         except Exception:
             pass
 
-    sql_folder = os.path.join(os.getcwd(), "queries")
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    sql_folder = os.path.join(base_dir, "queries")
     sample_size = int(config['test'].get('sample_size', 10))
 
     all_report_ids = set()
 
     for _, user in users_df.iterrows():
         userid = int(user['UserID'])
-        report_type = str(user.get('Reportype', "")).strip().lower()
+        report_type_raw = user.get('Reportype', None)
+        if pd.isna(report_type_raw):
+            report_type_raw = user.get('ReportType', "")
+        report_type = str(report_type_raw).strip().lower()
         customername, customer_id = fetch_customer_details(conn, userid)
 
         # Fetch reports for this customer
@@ -660,11 +664,29 @@ def main():
                 SELECT reportid FROM RG_Reports WITH (NOLOCK)
                 WHERE customerid = ?
                 AND DeliveryDate >= DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
-                AND DeliveryDate <= CAST(GETDATE() AS DATE)
+                AND DeliveryDate < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
                 """,
                 (customer_id,)
             )
-            report_ids = [row.reportid for row in cursor.fetchall()]
+            report_rows = cursor.fetchall()
+            report_ids = [row.reportid for row in report_rows]
+            # Fallback: if none found (or customer_id missing), try by userid
+            if not report_ids:
+                try:
+                    _drain_remaining_results(cursor)
+                except Exception:
+                    pass
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    SELECT reportid FROM RG_Reports WITH (NOLOCK)
+                    WHERE userid = ?
+                    AND DeliveryDate >= DATEADD(DAY, -1, CAST(GETDATE() AS DATE))
+                    AND DeliveryDate < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
+                    """,
+                    (userid,)
+                )
+                report_ids = [row.reportid for row in cursor.fetchall()]
             all_report_ids.update(report_ids)
         except Exception as e:
             logging.error(f"Error fetching reports for User {userid}: {e}")
@@ -724,8 +746,10 @@ def main():
                 continue
 
             for _, test_row in testcase_df.iterrows():
-                runtype_list = [v.strip().lower() for v in str(test_row.get("Runtype", "")).split(",")]
-                if report_type not in runtype_list:
+                runtype_raw = str(test_row.get("Runtype", ""))
+                runtype_list = [v.strip().lower() for v in runtype_raw.split(",") if v.strip()]
+                # If no runtype specified on test case, treat as applicable to all
+                if runtype_list and report_type not in runtype_list:
                     continue
 
                 testid = test_row['TestID']
